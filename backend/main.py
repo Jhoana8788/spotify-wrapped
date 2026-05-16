@@ -1,16 +1,15 @@
-"""
-filename: main.py
-author: Tu Nombre
-date: 2026-05-13
-version: 1.0
-description: Entry point de la API FastAPI para Spotify DWH.
-"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.v1.api import router as v1_router
 from app.core.config import settings
 
 app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
+
+@app.get("/")
+def root():
+    return {
+        "message": "Spotify Wrapped API funcionando"
+    }
 
 app.add_middleware(
     CORSMiddleware,

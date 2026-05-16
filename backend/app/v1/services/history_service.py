@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import psycopg2
 from app.core.config import settings
-from app.core.spotify_client import spotify_get
+from app.core.spotify_client import get_recently_played
 
 def _get_conn():
     return psycopg2.connect(settings.DATABASE_URL)
@@ -14,7 +14,7 @@ def extract_recently_played(token, after_ms=None):
     params = {"limit": 50}
     if after_ms is not None:
         params["after"] = after_ms
-    data = spotify_get("/me/player/recently-played", token, params=params)
+        data = get_recently_played(token, params=params)
     return data.get("items", [])
 
 def transform_recently_played(raw_items):
