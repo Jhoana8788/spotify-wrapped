@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  a {
+    @apply text-accent hover:text-accentHover transition-colors;
+  }
+
+  h1 {
+    @apply text-2xl font-bold;
+  }
+
+  h2 {
+    @apply text-xl font-semibold;
+  }
+
+  h3 {
+    @apply text-lg font-semibold;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-panel border border-border rounded-lg p-5 shadow-card;
+  }
+
+  .card-title {
+    @apply text-lg font-semibold mb-4 text-text;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2
+           text-sm font-semibold transition-colors disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-black hover:bg-accentHover;
+  }
+
+  .btn-secondary {
+    @apply bg-panelAlt text-text border border-border hover:bg-border;
+  }
+
+  .table-base {
+    @apply w-full text-sm text-left;
+  }
+
+  .table-base th {
+    @apply text-textMuted font-medium px-3 py-2 border-b border-border;
+  }
+
+  .table-base td {
+    @apply px-3 py-2 border-b border-border/60;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-accent/20 text-accent;
+  }
+
+  .badge-error {
+    @apply bg-red-500/20 text-red-400;
+  }
+
+  .badge-pending {
+    @apply bg-yellow-500/20 text-yellow-300;
+  }
+}
