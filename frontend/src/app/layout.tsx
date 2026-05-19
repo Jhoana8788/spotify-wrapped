@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "Spoty DWH",
-  description: "Dashboard del proyecto Spotify DWH",
+  title: "FREME EMOTIO — Music Analytics With Emotion",
+  description: "Analiza tu música. Siente la emoción.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body className="bg-bg text-text min-h-screen">
-        <Navbar />
-        <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
+        <div className="flex">
+          <Sidebar />
+          <main className="flex-1 min-w-0">
+            <div className="max-w-7xl mx-auto px-4 lg:px-8 py-6 lg:py-8">
+              {children}
+            </div>
+          </main>
+        </div>
       </body>
     </html>
   );

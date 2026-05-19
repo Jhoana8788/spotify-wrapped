@@ -1,72 +1,49 @@
 "use client";
 
+import Link from "next/link";
 import type { Track } from "@/types/track";
 import type { Artist } from "@/types/artist";
 
-type Props = {
-  tracks: Track[] | null;
-  artists: Artist[] | null; // para resolver artist_id → nombre si hace falta
-  loading: boolean;
-  error: string | null;
-};
+type Props = { tracks: Track[] | null; artists: Artist[] | null; loading: boolean; error: string | null; };
 
-function formatDuration(ms: number): string {
+function fmt(ms: number): string {
   if (!ms || ms < 0) return "—";
-  const totalSec = Math.round(ms / 1000);
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const t = Math.round(ms / 1000);
+  return `${Math.floor(t / 60)}:${(t % 60).toString().padStart(2, "0")}`;
 }
 
-export default function TopTracksCard({
-  tracks,
-  artists,
-  loading,
-  error,
-}: Props) {
+export default function TopTracksCard({ tracks, artists, loading, error }: Props) {
   const top5 = (tracks ?? []).slice(0, 5);
-
-  const artistById = new Map<string, string>();
-  (artists ?? []).forEach((a) => artistById.set(a.id, a.name));
+  const byId = new Map<string, string>();
+  (artists ?? []).forEach((a) => byId.set(a.id, a.name));
 
   return (
     <div className="card">
-      <h3 className="card-title">Top 5 canciones</h3>
-
+      <h3 className="card-title flex items-center justify-between">
+        <span className="flex items-center gap-2"><span>🎵</span> Top Canciones</span>
+        <Link href="/tracks" className="text-xs text-accent hover:underline">Ver todas</Link>
+      </h3>
       {loading && <p className="text-textMuted">Cargando…</p>}
-      {error && <p className="text-red-400">{error}</p>}
-
-      {!loading && !error && top5.length === 0 && (
-        <p className="text-textMuted">No hay datos todavía.</p>
-      )}
-
+      {error && <p className="text-rose-400">{error}</p>}
+      {!loading && !error && top5.length === 0 && <p className="text-textMuted">Sin datos.</p>}
       {!loading && !error && top5.length > 0 && (
-        <ol className="space-y-2">
+        <ol className="space-y-3">
           {top5.map((t, i) => {
-            const artist =
-              t.artist_name || artistById.get(t.artist_id) || "—";
+            const artist = t.artist_name || byId.get(t.artist_id) || "—";
             return (
-              <li key={t.id} className="flex items-center gap-3 py-1.5">
-                <span className="w-5 text-right text-textMuted text-sm">
-                  {i + 1}
-                </span>
+              <li key={t.id} className="flex items-center gap-3 group">
+                <span className="w-6 text-center text-textMuted text-sm font-medium">{i + 1}</span>
                 {t.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={t.image_url}
-                    alt={t.name}
-                    className="w-10 h-10 rounded object-cover bg-panelAlt"
-                  />
+                  <img src={t.image_url} alt={t.name} className="w-11 h-11 rounded object-cover bg-panelAlt" />
                 ) : (
-                  <div className="w-10 h-10 rounded bg-panelAlt" />
+                  <div className="w-11 h-11 rounded bg-panelAlt flex items-center justify-center text-lg">🎵</div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-text font-medium truncate">{t.name}</p>
                   <p className="text-xs text-textMuted truncate">{artist}</p>
                 </div>
-                <span className="text-xs text-textMuted tabular-nums">
-                  {formatDuration(t.duration_ms)}
-                </span>
+                <span className="text-xs text-textMuted tabular-nums">{fmt(t.duration_ms)}</span>
               </li>
             );
           })}

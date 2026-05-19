@@ -3,77 +3,54 @@
 @tailwind utilities;
 
 @layer base {
-  html,
-  body {
+  html, body {
     @apply bg-bg text-text font-sans antialiased;
     min-height: 100vh;
   }
-
-  a {
-    @apply text-accent hover:text-accentHover transition-colors;
+  body {
+    background:
+      radial-gradient(ellipse 1200px 600px at 50% -200px, rgba(139, 92, 246, 0.10), transparent),
+      radial-gradient(ellipse 800px 400px at 100% 100%, rgba(29, 185, 84, 0.06), transparent),
+      radial-gradient(ellipse 800px 400px at 0% 100%, rgba(236, 72, 153, 0.05), transparent),
+      #0a0a0f;
+    background-attachment: fixed;
   }
-
-  h1 {
-    @apply text-2xl font-bold;
-  }
-
-  h2 {
-    @apply text-xl font-semibold;
-  }
-
-  h3 {
-    @apply text-lg font-semibold;
-  }
+  a { @apply transition-colors; }
+  h1 { @apply text-3xl font-bold; }
+  h2 { @apply text-2xl font-bold; }
+  h3 { @apply text-lg font-semibold; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0a0f; }
+  ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #35354a; }
 }
 
 @layer components {
-  .card {
-    @apply bg-panel border border-border rounded-lg p-5 shadow-card;
-  }
+  .card { @apply bg-panel border border-border rounded-xl p-5 shadow-card transition-all; }
+  .card-hover { @apply hover:border-borderLight hover:bg-panelHover; }
+  .card-title { @apply text-base font-semibold mb-4 text-text flex items-center gap-2; }
 
-  .card-title {
-    @apply text-lg font-semibold mb-4 text-text;
-  }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-primary { @apply bg-accent text-black hover:bg-accentHover hover:scale-[1.02] active:scale-[0.98] shadow-glow; }
+  .btn-secondary { @apply bg-panelAlt text-text border border-border hover:bg-border; }
+  .btn-ghost { @apply text-textMuted hover:text-text hover:bg-panelAlt; }
 
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2
-           text-sm font-semibold transition-colors disabled:opacity-50
-           disabled:cursor-not-allowed;
-  }
+  .table-base { @apply w-full text-sm text-left; }
+  .table-base th { @apply text-textMuted font-medium px-3 py-2.5 border-b border-border text-xs uppercase tracking-wider; }
+  .table-base td { @apply px-3 py-3 border-b border-border/60; }
 
-  .btn-primary {
-    @apply bg-accent text-black hover:bg-accentHover;
-  }
+  .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium gap-1; }
+  .badge-success { @apply bg-accent/20 text-accent; }
+  .badge-error { @apply bg-rose-500/20 text-rose-400; }
+  .badge-pending { @apply bg-amber-500/20 text-amber-300; }
+  .badge-premium { @apply bg-gradient-to-r from-violet-500 to-pink-500 text-white shadow-sm; }
 
-  .btn-secondary {
-    @apply bg-panelAlt text-text border border-border hover:bg-border;
-  }
+  .nav-link { @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-textMuted transition-all; }
+  .nav-link:hover { @apply bg-panelAlt text-text; }
+  .nav-link.active { @apply bg-gradient-to-r from-accent/20 to-accent/5 text-accent border border-accent/20; }
 
-  .table-base {
-    @apply w-full text-sm text-left;
-  }
-
-  .table-base th {
-    @apply text-textMuted font-medium px-3 py-2 border-b border-border;
-  }
-
-  .table-base td {
-    @apply px-3 py-2 border-b border-border/60;
-  }
-
-  .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .badge-success {
-    @apply bg-accent/20 text-accent;
-  }
-
-  .badge-error {
-    @apply bg-red-500/20 text-red-400;
-  }
-
-  .badge-pending {
-    @apply bg-yellow-500/20 text-yellow-300;
-  }
+  .stat-value { @apply text-3xl font-bold tabular-nums; }
+  .stat-label { @apply text-xs text-textMuted uppercase tracking-wider; }
+  .trend-up { @apply text-accent text-xs flex items-center gap-1; }
+  .trend-down { @apply text-rose-400 text-xs flex items-center gap-1; }
 }

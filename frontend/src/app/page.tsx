@@ -4,27 +4,18 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isTokenValid } from "@/lib/auth";
 
-/**
- * Ruta raíz: decide en cliente a dónde mandar al usuario.
- * Si hay token válido → /dashboard; si no → /login.
- *
- * No podemos hacerlo en server component porque el JWT vive
- * en localStorage (no en cookie).
- */
 export default function RootRedirect() {
   const router = useRouter();
-
   useEffect(() => {
-    if (isTokenValid()) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
+    router.replace(isTokenValid() ? "/dashboard" : "/login");
   }, [router]);
 
   return (
-    <div className="flex items-center justify-center py-20 text-textMuted">
-      Redirigiendo…
+    <div className="flex items-center justify-center py-32 text-textMuted">
+      <div className="text-center">
+        <div className="text-5xl mb-4 animate-pulse">🎧</div>
+        <p>Cargando FREME EMOTIO…</p>
+      </div>
     </div>
   );
 }
