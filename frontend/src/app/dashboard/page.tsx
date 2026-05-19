@@ -145,7 +145,7 @@ function DashboardContent() {
         </div>
       </div>
 
-      <SystemStatus etlTables={etlTables} />
+      <SystemStatus etlTables={etlTables} etlRuns={etlRuns} />
     </div>
   );
 }

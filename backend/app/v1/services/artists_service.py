@@ -2,7 +2,7 @@ import psycopg2
 
 from app.core.config import settings
 from app.core.spotify_client import get_top_artists
-
+from app.core.spotify_client import get_top_artists, get_artists_batch
 
 def _get_conn():
     return psycopg2.connect(settings.DATABASE_URL)
@@ -68,6 +68,7 @@ def transform_top_artists(raw_artists):
 def load_artists(artists):
 
     inserted = 0
+    updated = 0
     skipped = 0
 
     with _get_conn() as conn:
@@ -82,19 +83,23 @@ def load_artists(artists):
                 cur.execute(
                     """
                     INSERT INTO dwh.dim_artists (
-                        spotify_id,
-                        name,
-                        popularity,
-                        followers_count,
-                        genres,
-                        loaded_at
+                        spotify_id, name, popularity,
+                        followers_count, genres, loaded_at
                     )
                     VALUES (
-                        %s,%s,%s,%s,%s,
-                        CURRENT_TIMESTAMP
+                        %s, %s, %s, %s, %s, CURRENT_TIMESTAMP
                     )
-                    ON CONFLICT (spotify_id)
-                    DO NOTHING
+                    ON CONFLICT (spotify_id) DO UPDATE SET
+                        name = COALESCE(EXCLUDED.name, dwh.dim_artists.name),
+                        popularity = COALESCE(EXCLUDED.popularity, dwh.dim_artists.popularity),
+                        followers_count = COALESCE(EXCLUDED.followers_count, dwh.dim_artists.followers_count),
+                        genres = CASE
+                            WHEN array_length(EXCLUDED.genres, 1) > 0
+                            THEN EXCLUDED.genres
+                            ELSE dwh.dim_artists.genres
+                        END,
+                        loaded_at = CURRENT_TIMESTAMP
+                    RETURNING (xmax = 0) AS was_insert
                     """,
                     (
                         a["spotify_id"],
@@ -105,14 +110,15 @@ def load_artists(artists):
                     )
                 )
 
-                if cur.rowcount == 1:
+                row = cur.fetchone()
+                if row and row[0]:
                     inserted += 1
                 else:
-                    skipped += 1
+                    updated += 1
 
         conn.commit()
 
-    return inserted, skipped
+    return inserted, updated + skipped
 
 
 # =========================================
@@ -232,11 +238,47 @@ def extract_artists_from_history(raw_history):
 # =========================================
 
 def enrich_artists_with_details(artists, token):
+    """
+    Para artistas extraídos del history (que vienen sin popularity/followers/genres),
+    consulta /v1/artists?ids=... y completa esos campos.
+    """
 
-    # Aquí luego puedes consultar Spotify
-    # para traer popularity/followers/genres reales
+    if not artists:
+        return artists
 
-    return artists
+    needs = [
+        a for a in artists
+        if a.get("popularity") is None
+        or a.get("followers_count") is None
+        or not a.get("genres")
+    ]
+
+    if not needs:
+        return artists
+
+    ids = [a["spotify_id"] for a in needs if a.get("spotify_id")]
+    if not ids:
+        return artists
+
+    details = get_artists_batch(token, ids)
+    by_id = {d["id"]: d for d in details if d and d.get("id")}
+
+    enriched = []
+    for a in artists:
+        sid = a.get("spotify_id")
+        d = by_id.get(sid)
+        if d:
+            enriched.append({
+                "spotify_id": sid,
+                "name": d.get("name") or a.get("name"),
+                "popularity": d.get("popularity"),
+                "followers_count": (d.get("followers") or {}).get("total"),
+                "genres": d.get("genres") or a.get("genres") or [],
+            })
+        else:
+            enriched.append(a)
+
+    return enriched
 
 
 # =========================================

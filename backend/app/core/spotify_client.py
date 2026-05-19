@@ -121,3 +121,27 @@ def get_recently_played(token: str, after_ms: int | None = None) -> list[dict]:
             detail=f"Spotify /recently-played error: {response.text}"
         )
     return response.json().get("items", [])
+
+def get_artists_batch(token: str, artist_ids: list[str]) -> list[dict]:
+    """
+    GET /v1/artists?ids=id1,id2,...
+    Trae los objetos completos de artistas (popularity, followers, genres).
+    Máximo 50 IDs por llamada.
+    """
+    if not artist_ids:
+        return []
+
+    artists: list[dict] = []
+    for i in range(0, len(artist_ids), 50):
+        batch = artist_ids[i:i + 50]
+        response = requests.get(
+            f"{SPOTIFY_BASE_URL}/artists",
+            headers=_get_headers(token),
+            params={"ids": ",".join(batch)},
+        )
+        if response.status_code != 200:
+            print(f"Spotify /artists batch error: {response.text}")
+            continue
+        artists.extend(response.json().get("artists", []))
+
+    return artists
